@@ -37,7 +37,7 @@ class AssignmentCard extends StatelessWidget {
                               color: textPrimaryColor,
                               fontWeight: FontWeight.bold)),
                       SizedBox(height: 7),
-                      Text('Due: ${assignment.getDate()}',
+                      Text('Due: ${assignment.getLongFormatDate()}',
                           style: TextStyle(color: textPrimaryColor)),
                       if (!isShowingInClass)
                         Text('In: ${assignment.className}',

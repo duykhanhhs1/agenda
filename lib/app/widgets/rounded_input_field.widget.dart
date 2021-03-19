@@ -14,6 +14,7 @@ class RoundedInputField extends StatelessWidget {
     this.obscureText = false,
     this.initialValue,
     this.borderRadius = const BorderRadius.all(Radius.circular(50)),
+    this.contentPadding = const EdgeInsets.symmetric(horizontal: 10),
   });
 
   final Key key;
@@ -26,6 +27,7 @@ class RoundedInputField extends StatelessWidget {
   final bool obscureText;
   final String initialValue;
   final BorderRadius borderRadius;
+  final contentPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +38,7 @@ class RoundedInputField extends StatelessWidget {
         fillColor: kPrimaryLightColor,
         hintText: hintText,
         prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+        contentPadding: contentPadding,
         border: OutlineInputBorder(
           borderRadius: borderRadius,
         ),
@@ -47,7 +49,6 @@ class RoundedInputField extends StatelessWidget {
       obscureText: obscureText,
       initialValue: initialValue,
       controller: controller,
-
     );
   }
 }

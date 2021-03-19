@@ -1,8 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
-
-
 import 'package:ru_agenda/app/theme/color_theme.dart';
 import 'package:ru_agenda/app/data/models/class.model.dart';
 import 'package:ru_agenda/app/data/models/assignment.model.dart';
@@ -67,21 +65,21 @@ class AssignmentDetailContainer extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: 20),
+        SizedBox(height: 10),
         isOpenFormEdit
             ? _buildAttributeAssign(
                 title: 'For Class',
                 widgetContent: _buildClassDropdown(controller))
             : _buildAttributeAssign(
                 title: 'For Class', textContent: assignment.className),
-        SizedBox(height: 20),
+        SizedBox(height: 10),
         isOpenFormEdit
             ? _buildAttributeAssign(
                 title: 'Due Date',
                 widgetContent: _buildDatePicker(controller, context))
             : _buildAttributeAssign(
-                title: 'Due Date', textContent: assignment.getDate()),
-        SizedBox(height: 20),
+                title: 'Due Date', textContent: assignment.getLongFormatDate()),
+        SizedBox(height: 10),
         isOpenFormEdit
             ? _buildAttributeAssign(
                 title: 'Notification',
@@ -90,7 +88,7 @@ class AssignmentDetailContainer extends StatelessWidget {
             : _buildAttributeAssign(
                 title: 'Notification',
                 textContent: '${assignment.numberNoticeDay}'),
-        SizedBox(height: 20),
+        SizedBox(height: 10),
         isOpenFormEdit
             ? _buildAttributeAssign(
                 title: 'Description',
@@ -104,14 +102,15 @@ class AssignmentDetailContainer extends StatelessWidget {
 
   SizedBox _buildAssignDescInputField(HomeController controller) {
     return SizedBox(
-                height: 150,
-                width: Get.width,
-                child: RoundedInputField(
-                  borderRadius: BorderRadius.circular(10),
-                  maxLines: 9,
-                  controller: controller.assignDescInputController,
-                ),
-              );
+      height: 150,
+      width: Get.width,
+      child: RoundedInputField(
+        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+        borderRadius: BorderRadius.circular(10),
+        maxLines: 10,
+        controller: controller.assignDescInputController,
+      ),
+    );
   }
 
   Widget _buildAttributeAssign(
@@ -124,7 +123,9 @@ class AssignmentDetailContainer extends StatelessWidget {
                 color: textPrimaryColor, fontWeight: FontWeight.bold)),
         if (textContent != null)
           Container(
-            alignment: title != 'Description' ? Alignment.centerLeft : Alignment.topLeft,
+            alignment: title != 'Description'
+                ? Alignment.centerLeft
+                : Alignment.topLeft,
             height: title != 'Description' ? 35 : 150,
             child: Text(
               textContent,
@@ -143,7 +144,9 @@ class AssignmentDetailContainer extends StatelessWidget {
           child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Text('${assignment.getDate()}'),
+          controller.isOpenFormEdit.value
+              ? Text('${assignment.getShortFormatDate()}')
+              : Text('${assignment.getLongFormatDate()}'),
           Icon(Icons.date_range_rounded),
         ],
       )),
