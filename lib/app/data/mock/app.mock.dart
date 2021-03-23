@@ -128,7 +128,7 @@ class AppMock {
     AssignmentModel(
       assignmentName: 'Requirements Document',
       dueDate: DateTime(2020, 10, 05),
-      className: 'ITEC 326',
+      className: 'ITEC 324',
       numberNoticeDay: 3,
       assignmentDesc:
           'Sequi ducimus vel. In aperiam non odio adipisci perferendis magnam ducimus alias in. Aut blanditiis ut sequi deleniti amet ipsa. Molestias ipsa architecto consequatur aspernatur. Possimus voluptatem ipsam rerum. Fugit doloremque ut delectus voluptas ipsa ut porro eos nobis. Laboriosam rem esse neque quia. Praesentium omnis porro. Quod dolorem corrupti culpa enim. Ab eos voluptas. Nam ex deserunt sapiente aliquam ipsum. Qui est enim autem velit officiis. Voluptatem similique pariatur facere ut vel perspiciatis rerum sed.',

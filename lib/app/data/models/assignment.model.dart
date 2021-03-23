@@ -17,10 +17,10 @@ class AssignmentModel {
     this.assignmentDesc,
     this.assignmentNo,
     this.assignmentName,
-    this.dueDate,
     this.className,
+    dueDate,
     this.numberNoticeDay,
-  });
+  }) : dueDate = dueDate ?? DateTime.now();
 
 
   String getLongFormatDate() => DateFormat('EEEE, MMMM d, h:mm a').format(dueDate);

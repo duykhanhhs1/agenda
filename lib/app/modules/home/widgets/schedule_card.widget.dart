@@ -31,7 +31,7 @@ class ScheduleCard extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'Days/Time: ${classModel.dateMeet}',
+                  'Days/Time: ${classModel.getLongFormatDate()}',
                   style: TextStyle(
                     color: textPrimaryColor,
                   ),

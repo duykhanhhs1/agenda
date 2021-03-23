@@ -22,6 +22,8 @@ environment:
 
 dependencies:
   get: ^3.26.0
+  dio: 3.0.10
+  get_storage: 1.4.0
   flutter:
     sdk: flutter
 
@@ -31,6 +33,8 @@ dependencies:
   cupertino_icons: ^1.0.0
 
 dev_dependencies:
+  flutter_slidable: ^0.5.7
+  form_field_validator: ^1.0.1
   json_serializable: 3.5.1
   build_runner: ^1.11.1
   flutter_test:
