@@ -8,6 +8,7 @@ import 'package:ru_agenda/app/data/repositories/class.repository.dart';
 
 class HomeController extends GetxController {
   final ClassRepository repository;
+
   HomeController({@required this.repository}) : assert(repository != null);
 
   static HomeController get to => Get.find<HomeController>();
@@ -18,16 +19,21 @@ class HomeController extends GetxController {
   RxBool isSelectedByClass = RxBool(false);
   RxBool isSelectedBySchedule = RxBool(false);
 
+  List<int> notificationDays = [1, 2, 3, 4, 5];
+
   RxBool isOpenFormEdit = RxBool(true);
   TextEditingController assignNameInputController = TextEditingController();
   TextEditingController assignDescInputController = TextEditingController();
-  DateTime dueDateSelected = DateTime.now();
+  RxInt noticeDaysSelected = RxInt();
+
   RxString classNameSelected = RxString();
   TextEditingController courseTitleInputController = TextEditingController();
   TextEditingController courseNumInputController = TextEditingController();
-  TextEditingController locationNameInputController = TextEditingController();
+  TextEditingController locationInputController = TextEditingController();
   TextEditingController instructorInputController = TextEditingController();
-  DateTime dateMeetSelected = DateTime.now();
+
+  DateTime dateSelected = DateTime.now();
+  TimeOfDay timeSelected = TimeOfDay.now();
 
   RxList<AssignmentModel> assignments = RxList<AssignmentModel>();
   RxList<ClassModel> classes = RxList<ClassModel>();
@@ -44,6 +50,12 @@ class HomeController extends GetxController {
   void onReady() {
     // TODO: implement onReady
     super.onReady();
+  }
+
+  @override
+  void onClose() {
+    // TODO: implement onClose
+    super.onClose();
   }
 
   ///Handle get data API
@@ -80,6 +92,12 @@ class HomeController extends GetxController {
     update();
   }
 
+  String getLongFormatDate() =>
+      DateFormat('EEEE, MMMM d, h:mm a').format(dateSelected);
+
+  String getShortFormatDate() =>
+      DateFormat('dd-MM-y, h:mm a').format(dateSelected);
+
   ///Show assignments
   void checkShowAssignsInClass(ClassModel classModel) {
     classModel.isShowingAssignments = !classModel.isShowingAssignments;
@@ -97,44 +115,60 @@ class HomeController extends GetxController {
     classNameSelected.value = assignment.className;
     assignDescInputController.text = assignment.assignmentDesc;
     assignNameInputController.text = assignment.assignmentName;
+    noticeDaysSelected.value = assignment.numberNoticeDay;
+    dateSelected = assignment.dueDate;
   }
 
-  void updateClassTitle(AssignmentModel assignment, String className) {
-    assignment.className = className;
-    update();
-  }
-
-  void updateClassTitle1(String className) {
+  void updateClassSelected(String className) {
     classNameSelected.value = className;
     update();
   }
 
-  void updateNoticeAssignment(AssignmentModel assignment, int number) {
-    assignment.numberNoticeDay = number;
+  void updateNoticeSelected(int value) {
+    noticeDaysSelected.value = value;
     update();
   }
 
-  void selectDate(BuildContext context, AssignmentModel assignment) async {
-    DateTime selectedDate = await showDatePicker(
+  void selectDate(BuildContext context, [AssignmentModel assignment]) async {
+    await showDatePicker(
       context: context,
-      initialDate: assignment.dueDate,
+      initialDate: dateSelected,
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
-    );
-    showTimePicker(context: context, initialTime: TimeOfDay.now());
-    if (selectedDate != null && selectedDate != assignment.dueDate) {
-      assignment.dueDate = selectedDate;
-    }
+    ).then((value) {
+      if (value != null) dateSelected = value;
+      return dateSelected;
+    });
+    await showTimePicker(
+      context: context,
+      initialTime:
+          TimeOfDay(hour: timeSelected.hour, minute: timeSelected.minute),
+    ).then((value) {
+      if (value != null) timeSelected = value;
+      return timeSelected;
+    });
+    dateSelected = DateTime(dateSelected.year, dateSelected.month,
+        dateSelected.day, timeSelected.hour, timeSelected.minute);
     update();
   }
 
-  String getCourseTitle(String classNameSelected) {
-    if (classNameSelected != null) {
-      ClassModel classModel = classes
-          .singleWhere((element) => element.courseTitle == classNameSelected);
+  String getCourseTitleDropdown() {
+    if (classNameSelected.value != null) {
+      ClassModel classModel = classes.firstWhere(
+          (element) => element.courseTitle == classNameSelected.value);
       return classModel.courseTitle;
     }
-    return null;
+    classNameSelected = classes.first.courseTitle.obs;
+    return classNameSelected.value;
+  }
+
+  int getNoticeDaysDropdown() {
+    if (noticeDaysSelected.value != null) {
+      return notificationDays
+          .firstWhere((element) => element == noticeDaysSelected.value);
+    }
+    noticeDaysSelected.value = notificationDays.first;
+    return noticeDaysSelected.value;
   }
 
   void setOpenFormEdit(bool value) {
@@ -145,20 +179,36 @@ class HomeController extends GetxController {
   ///Add or save changes assignment
   void saveChangesAssignment(AssignmentModel assignment) {
     if (formKey.currentState.validate()) {
-      if (assignment.assignmentName == null) assignments.add(assignment);
-      assignment.assignmentName = assignNameInputController.text;
-      assignment.assignmentDesc = assignDescInputController.text;
-      assignment.className = classNameSelected.value;
-      setOpenFormEdit(false);
-      update();
+      if (dateSelected.isAfter(DateTime.now())) {
+        if (assignment.assignmentName == null) assignments.add(assignment);
+        assignment.assignmentName = assignNameInputController.text;
+        assignment.assignmentDesc = assignDescInputController.text;
+        assignment.className = classNameSelected.value;
+        assignment.numberNoticeDay = noticeDaysSelected.value;
+        assignment.dueDate = dateSelected;
+        setOpenFormEdit(false);
+      } else {
+        Get.snackbar(
+            'Error', 'The due time must be greater than the current time',
+            snackPosition: SnackPosition.BOTTOM,
+            duration: const Duration(seconds: 3),
+            colorText: Colors.red,
+            backgroundColor: Colors.white.withOpacity(.8));
+      }
     }
-
+    update();
   }
 
-  void clearFieldsAddAssignment() {
+  void clearFieldsFormAddInput() {
     setOpenFormEdit(true);
     assignNameInputController.clear();
     assignDescInputController.clear();
+    courseTitleInputController.clear();
+    courseNumInputController.clear();
+    locationInputController.clear();
+    instructorInputController.clear();
+    dateSelected = DateTime.now();
+    timeSelected = TimeOfDay.now();
     update();
   }
 
@@ -170,27 +220,35 @@ class HomeController extends GetxController {
   }
 
   ///CLASS
-  void selectDateMeet(BuildContext context, ClassModel classModel) async {
-    dateMeetSelected = await showDatePicker(
-      context: context,
-      initialDate: classModel.dateMeet,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
-    );
+  void addClass(ClassModel classModel) {
+    if (formKey.currentState.validate() &&
+        dateSelected.isAfter(DateTime.now())) {
+      classModel.courseTitle = courseTitleInputController.text;
+      classModel.courseNumber = int.tryParse(courseNumInputController.text);
+      classModel.location = locationInputController.text;
+      classModel.dateMeet = dateSelected;
+      classModel.instructorName = instructorInputController.text;
+      classes.add(classModel);
+      Get.back();
+      update();
+    } else {
+      Get.snackbar(
+          'Error', 'The due time must be greater than the current time',
+          snackPosition: SnackPosition.BOTTOM,
+          duration: const Duration(seconds: 3),
+          colorText: Colors.red,
+          backgroundColor: Colors.white.withOpacity(.8));
+    }
+  }
+
+  void removeClass(ClassModel classModel) {
+    classes.remove(classModel);
     update();
   }
 
-  String getShortFormatDate(DateTime dateTime) =>
-      DateFormat('dd-MM-y').format(dateTime);
-
-  void addClass(ClassModel classModel) {
-    classModel.courseTitle = courseTitleInputController.text;
-    classModel.courseNumber = int.tryParse(courseNumInputController.text);
-    classModel.location = locationNameInputController.text;
-    classModel.dateMeet = dateMeetSelected;
-    classModel.instructorName = instructorInputController.text;
-    classes.add(classModel);
-    Get.back();
+  void clearDataOfClass(ClassModel classModel) {
+    assignments.removeWhere((_) => _.className == classModel.courseTitle);
+    classModel.isShowingAssignments = false;
     update();
   }
 
@@ -199,11 +257,5 @@ class HomeController extends GetxController {
     assignments.clear();
     classes.clear();
     update();
-  }
-
-  @override
-  void onClose() {
-    // TODO: implement onClose
-    super.onClose();
   }
 }

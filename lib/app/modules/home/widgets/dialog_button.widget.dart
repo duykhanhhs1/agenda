@@ -20,6 +20,7 @@ class DialogButton extends StatelessWidget {
       onPressed: onPressed,
       child: Text(text),
       color: kPrimaryColor,
+      textColor: kPrimaryLightColor,
     );
   }
 }

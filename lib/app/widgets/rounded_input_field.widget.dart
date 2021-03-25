@@ -14,8 +14,10 @@ class RoundedInputField extends StatelessWidget {
     this.obscureText = false,
     this.initialValue,
     this.borderRadius = const BorderRadius.all(Radius.circular(50)),
-    this.contentPadding = const EdgeInsets.symmetric(vertical: 0,horizontal: 10),
+    this.contentPadding =
+        const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
     this.validator,
+    this.keyboardType,
   });
 
   final Key key;
@@ -30,6 +32,7 @@ class RoundedInputField extends StatelessWidget {
   final BorderRadius borderRadius;
   final EdgeInsetsGeometry contentPadding;
   final FormFieldValidator<String> validator;
+  final TextInputType keyboardType;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +47,6 @@ class RoundedInputField extends StatelessWidget {
         border: OutlineInputBorder(
           borderRadius: borderRadius,
         ),
-        helperText: ' ',
       ),
       onFieldSubmitted: onFieldSubmitted,
       style: style,
@@ -53,6 +55,8 @@ class RoundedInputField extends StatelessWidget {
       initialValue: initialValue,
       controller: controller,
       validator: validator,
+      keyboardType: keyboardType,
+     // textInputAction: TextInputAction.done,
     );
   }
 }

@@ -1,16 +1,16 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
-import 'package:ru_agenda/app/data/models/class.model.dart';
-import 'package:ru_agenda/app/modules/home/widgets/custom_dialog.widget.dart';
-import 'package:ru_agenda/app/modules/home/widgets/dialog_button.widget.dart';
-import 'package:ru_agenda/app/modules/home/widgets/form_add_class.widget.dart';
 import 'package:ru_agenda/app/routes/app_pages.dart';
 import 'package:ru_agenda/app/theme/color_theme.dart';
+import 'package:ru_agenda/app/data/models/class.model.dart';
 import 'package:ru_agenda/app/data/models/assignment.model.dart';
 import 'package:ru_agenda/app/modules/home/widgets/class_card.widget.dart';
 import 'package:ru_agenda/app/modules/home/widgets/schedule_card.widget.dart';
 import 'package:ru_agenda/app/modules/home/controllers/home.controller.dart';
+import 'package:ru_agenda/app/modules/home/widgets/custom_dialog.widget.dart';
+import 'package:ru_agenda/app/modules/home/widgets/dialog_button.widget.dart';
+import 'package:ru_agenda/app/modules/home/widgets/form_add_class.widget.dart';
 import 'package:ru_agenda/app/modules/home/widgets/assignment_card.widget.dart';
 import 'package:ru_agenda/app/modules/home/widgets/assignment_detail_container.dart';
 
@@ -25,8 +25,8 @@ class HomeView extends StatelessWidget {
               title: Text('RU Agenda'),
               centerTitle: true,
               backgroundColor: kSecondColor,
-              actions: [_buildResetIcon(controller)],
-              leading: _buildBackIcon(),
+              actions: [_buildResetButton(controller)],
+              leading: _buildLogoutIcon(),
             ),
             body: Column(
               children: <Widget>[
@@ -58,18 +58,31 @@ class HomeView extends StatelessWidget {
         });
   }
 
-
-  Widget _buildBackIcon() {
+  Widget _buildLogoutIcon() {
     return Center(
         child: GestureDetector(
       onTap: () {
-        Get.offAllNamed(Routes.LOGIN);
+        Get.dialog(CustomDialog(
+            title: 'Confirmation',
+            content: 'Are you sure you want to log out ?',
+            actions: [
+              DialogButton(
+                  text: 'Log out',
+                  onPressed: () {
+                    Get.offAllNamed(Routes.LOGIN);
+                  }),
+              DialogButton(
+                  text: 'Cancel',
+                  onPressed: () {
+                    Get.back();
+                  }),
+            ]));
       },
       child: Icon(Icons.arrow_back_rounded),
     ));
   }
 
-  Widget _buildResetIcon(HomeController controller) {
+  Widget _buildResetButton(HomeController controller) {
     return Center(
       child: GestureDetector(
         child: Padding(
@@ -88,7 +101,23 @@ class HomeView extends StatelessWidget {
           ),
         ),
         onTap: () {
-          _showConfirmResetDialog(controller);
+          Get.dialog(CustomDialog(
+              title: 'Confirmation',
+              content:
+                  'Are you sure you want to reset list of classes and list of assignments?',
+              actions: [
+                DialogButton(
+                    text: 'Reset',
+                    onPressed: () {
+                      controller.resetAll();
+                      Get.back();
+                    }),
+                DialogButton(
+                    text: 'Cancel',
+                    onPressed: () {
+                      Get.back();
+                    }),
+              ]));
         },
       ),
     );
@@ -97,59 +126,23 @@ class HomeView extends StatelessWidget {
   Widget _buildAddContainer(HomeController controller) {
     return InkWell(
       onTap: () {
+        controller.clearFieldsFormAddInput();
         if (controller.isSelectedByDate.value) {
-          controller.clearFieldsAddAssignment();
-          Get.dialog(
-            AssignmentDetailContainer(assignment: AssignmentModel()),
-          );
+          Get.dialog(AssignmentDetailContainer(assignment: AssignmentModel()));
         } else {
-          Get.dialog(
-            FormAddClass(
-              classModel: ClassModel(),
-            ),
-          );
+          Get.dialog(FormAddClass(classModel: ClassModel()));
         }
       },
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Text(
-            controller.isSelectedByDate.value
-                ? 'Add an assignment'
-                : 'Add a class',
-            style:
-            TextStyle(color: textPrimaryColor, fontWeight: FontWeight.bold),
-          ),
-          Icon(
-            Icons.add,
-            size: 40,
-            color: Colors.grey,
-          )
-        ],
-      ),
-    );
-  }
-
-  Future _showConfirmResetDialog(HomeController controller) {
-    return Get.dialog(
-      CustomDialog(
-        title: 'Confirmation',
-        content:
-            'Are you sure you want to reset list of classes and list of assignments?',
-        actions: [
-          DialogButton(
-            onPressed: () {
-              controller.resetAll();
-              Get.back();
-            },
-            text: 'Reset',
-          ),
-          DialogButton(
-            onPressed: () {
-              Get.back();
-            },
-            text: 'Cancel',
-          ),
+              controller.isSelectedByDate.value
+                  ? 'Add an assignment'
+                  : 'Add a class',
+              style: TextStyle(
+                  color: textPrimaryColor, fontWeight: FontWeight.bold)),
+          Icon(Icons.add, size: 40, color: Colors.grey)
         ],
       ),
     );
@@ -159,9 +152,7 @@ class HomeView extends StatelessWidget {
     return ListView.builder(
       itemCount: controller.classes.length,
       itemBuilder: (context, index) {
-        return ScheduleCard(
-          classModel: controller.classes[index],
-        );
+        return ScheduleCard(classModel: controller.classes[index]);
       },
     );
   }
@@ -179,21 +170,19 @@ class HomeView extends StatelessWidget {
               controller.selectOption('By Date');
             }),
         _buildOptionNavBar(
-          isSelected: controller.isSelectedByClass.value,
-          content: 'By Class',
-          onTap: () {
-            controller.selectOption('By Class');
-          },
-        ),
+            isSelected: controller.isSelectedByClass.value,
+            content: 'By Class',
+            onTap: () {
+              controller.selectOption('By Class');
+            }),
         _buildOptionNavBar(
-          isSelected: controller.isSelectedBySchedule.value,
-          content: 'By Schedule',
-          topRight: Radius.circular(15),
-          bottomRight: Radius.circular(15),
-          onTap: () {
-            controller.selectOption('By Schedule');
-          },
-        ),
+            isSelected: controller.isSelectedBySchedule.value,
+            content: 'By Schedule',
+            topRight: Radius.circular(15),
+            bottomRight: Radius.circular(15),
+            onTap: () {
+              controller.selectOption('By Schedule');
+            }),
       ],
     );
   }
@@ -204,21 +193,18 @@ class HomeView extends StatelessWidget {
       itemBuilder: (context, index) {
         return Column(
           children: [
-            ClassCard(
-              classModel: controller.classes[index],
-            ),
+            ClassCard(classModel: controller.classes[index]),
             if (controller.classes[index].isShowingAssignments)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 30),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(maxHeight: 300),
-                  child: _buildListAssignment(
-                      controller: controller,
-                      assignments: controller.getAssignmentsOfClass(index),
-                      isShowingInClass:
-                          controller.classes[index].isShowingAssignments),
-                ),
-              ),
+                    constraints: BoxConstraints(maxHeight: 300),
+                    child: _buildListAssignment(
+                        controller: controller,
+                        assignments: controller.getAssignmentsOfClass(index),
+                        isShowingInClass:
+                            controller.classes[index].isShowingAssignments)),
+              )
           ],
         );
       },
@@ -228,39 +214,32 @@ class HomeView extends StatelessWidget {
   Widget _buildListAssignment(
       {List<AssignmentModel> assignments,
       bool isShowingInClass,
-
       HomeController controller}) {
     return ListView.builder(
       shrinkWrap: true,
       itemCount: assignments.length,
       itemBuilder: (context, index) {
         return GestureDetector(
-          onTap: () {
-            controller.setOpenFormEdit(false);
-            Get.dialog(
-              AssignmentDetailContainer(
+            onTap: () {
+              controller.setOpenFormEdit(false);
+              Get.dialog(
+                  AssignmentDetailContainer(assignment: assignments[index]));
+            },
+            child: AssignmentCard(
                 assignment: assignments[index],
-              ),
-            );
-          },
-          child: AssignmentCard(
-            assignment: assignments[index],
-            isShowingInClass: isShowingInClass,
-          ),
-        );
+                isShowingInClass: isShowingInClass));
       },
     );
   }
 
-  Widget _buildOptionNavBar({
-    bool isSelected,
-    String content,
-    Radius topLeft,
-    Radius topRight,
-    Radius bottomLeft,
-    Radius bottomRight,
-    Function onTap,
-  }) {
+  Widget _buildOptionNavBar(
+      {bool isSelected,
+      String content,
+      Radius topLeft,
+      Radius topRight,
+      Radius bottomLeft,
+      Radius bottomRight,
+      Function onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -277,11 +256,9 @@ class HomeView extends StatelessWidget {
                 topRight: topRight != null ? topRight : Radius.circular(0),
                 bottomRight:
                     bottomRight != null ? bottomRight : Radius.circular(0))),
-        child: Text(
-          content,
-          style:
-              TextStyle(color: isSelected ? kPrimaryLightColor : kPrimaryColor),
-        ),
+        child: Text(content,
+            style: TextStyle(
+                color: isSelected ? kPrimaryLightColor : kPrimaryColor)),
       ),
     );
   }

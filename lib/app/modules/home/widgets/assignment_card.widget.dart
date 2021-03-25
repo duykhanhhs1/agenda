@@ -5,11 +5,14 @@ import 'package:ru_agenda/app/theme/color_theme.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:ru_agenda/app/data/models/assignment.model.dart';
 import 'package:ru_agenda/app/modules/home/controllers/home.controller.dart';
+import 'package:ru_agenda/app/modules/home/widgets/custom_dialog.widget.dart';
+import 'package:ru_agenda/app/modules/home/widgets/dialog_button.widget.dart';
 
 class AssignmentCard extends StatelessWidget {
   const AssignmentCard({
     Key key,
-    this.assignment, this.isShowingInClass,
+    this.assignment,
+    this.isShowingInClass,
   }) : super(key: key);
 
   final AssignmentModel assignment;
@@ -27,19 +30,10 @@ class AssignmentCard extends StatelessWidget {
             child: Slidable(
               actionPane: SlidableDrawerActionPane(),
               secondaryActions: [
-                Container(
-                  width: 40,
-                  child: IconSlideAction(
-                    caption: 'Remove',
-                    color: kSecondColor,
-                    icon: Icons.delete,
-                  ),
-                ),
+                _buildIconSlideAction(controller),
               ],
               child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                 margin: EdgeInsets.all(0),
                 shadowColor: kPrimaryColor,
                 child: Padding(
@@ -74,5 +68,31 @@ class AssignmentCard extends StatelessWidget {
             ),
           );
         });
+  }
+
+  Widget _buildIconSlideAction(HomeController controller) {
+    return IconSlideAction(
+                caption: 'Remove',
+                color: kSecondColor,
+                icon: Icons.delete,
+                onTap: () {
+                  Get.dialog(CustomDialog(
+                      title: 'Confirmation',
+                      content:
+                          'Are you sure you want to remove this assignment?',
+                      actions: [
+                        DialogButton(
+                            onPressed: () {
+                              controller.removeAssignment(assignment);
+                            },
+                            text: 'Remove'),
+                        DialogButton(
+                            onPressed: () {
+                              Get.back();
+                            },
+                            text: 'Cancel')
+                      ]));
+                },
+              );
   }
 }

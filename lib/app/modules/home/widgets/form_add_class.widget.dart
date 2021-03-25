@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:form_field_validator/form_field_validator.dart';
+
 import 'package:ru_agenda/app/data/models/class.model.dart';
 import 'package:ru_agenda/app/modules/home/controllers/home.controller.dart';
+import 'package:ru_agenda/app/modules/home/widgets/dialog_button.widget.dart';
 import 'package:ru_agenda/app/modules/home/widgets/rounded_container.widget.dart';
 import 'package:ru_agenda/app/theme/color_theme.dart';
 import 'package:ru_agenda/app/widgets/rounded_input_field.widget.dart';
@@ -26,33 +29,42 @@ class FormAddClass extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      GestureDetector(
-                        child: Icon(Icons.check),
-                        onTap: () {
-                          controller.addClass(classModel);
-                        },
-                      ),
-                    ],
-                  ),
                   _buildAttributeClass(
                     title: 'Course title',
                     widgetContent: _buildInputFieldClass(
+                        validator: MultiValidator([
+                          RequiredValidator(
+                              errorText: 'This field is required'),
+                        ]),
                         controller: controller.courseTitleInputController),
                   ),
                   SizedBox(height: 10),
                   _buildAttributeClass(
                     title: 'Course number',
                     widgetContent: _buildInputFieldClass(
+                        keyboardType: TextInputType.number,
+                        validator: MultiValidator([
+                          RequiredValidator(
+                              errorText: 'This field is required'),
+                          RangeValidator(
+                              min: 1,
+                              max: 100000000000000,
+                              errorText: 'Please enter a number > 0')
+                        ]),
                         controller: controller.courseNumInputController),
                   ),
-                  SizedBox(height: 10,width: Get.width,),
+                  SizedBox(
+                    height: 10,
+                    width: Get.width,
+                  ),
                   _buildAttributeClass(
                     title: 'Location',
                     widgetContent: _buildInputFieldClass(
-                        controller: controller.locationNameInputController),
+                        validator: MultiValidator([
+                          RequiredValidator(
+                              errorText: 'This field is required'),
+                        ]),
+                        controller: controller.locationInputController),
                   ),
                   SizedBox(height: 10),
                   _buildAttributeClass(
@@ -63,7 +75,23 @@ class FormAddClass extends StatelessWidget {
                   _buildAttributeClass(
                     title: 'Instructor',
                     widgetContent: _buildInputFieldClass(
+                        validator: MultiValidator([
+                          RequiredValidator(
+                              errorText: 'This field is required'),
+                        ]),
                         controller: controller.instructorInputController),
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      DialogButton(
+                        text: 'Done',
+                        onPressed: () {
+                          controller.addClass(classModel);
+                        },
+                      )
+                    ],
                   ),
                 ],
               ),
@@ -99,16 +127,17 @@ class FormAddClass extends StatelessWidget {
     );
   }
 
-  Widget _buildInputFieldClass({TextEditingController controller}) {
-    return SizedBox(
-      height: 60,
-      width: Get.width,
-      child: RoundedInputField(
-        borderRadius: BorderRadius.circular(10),
-        maxLines: 1,
-        controller: controller,
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
+  Widget _buildInputFieldClass(
+      {TextEditingController controller,
+      FormFieldValidator<String> validator,
+      TextInputType keyboardType}) {
+    return RoundedInputField(
+      borderRadius: BorderRadius.circular(10),
+      maxLines: 1,
+      controller: controller,
+      style: TextStyle(fontWeight: FontWeight.bold),
+      validator: validator,
+      keyboardType: keyboardType,
     );
   }
 
@@ -118,12 +147,12 @@ class FormAddClass extends StatelessWidget {
           child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Text('${controller.getShortFormatDate(controller.dateMeetSelected)}'),
+          Text('${controller.getShortFormatDate()}'),
           Icon(Icons.date_range_rounded),
         ],
       )),
       onTap: () {
-        controller.selectDateMeet(context, classModel);
+        controller.selectDate(context);
       },
     );
   }

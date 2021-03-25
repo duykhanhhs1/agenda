@@ -12,9 +12,7 @@ ClassModel _$ClassModelFromJson(Map<String, dynamic> json) {
     courseTitle: json['courseTitle'] as String,
     courseNumber: json['courseNumber'] as int,
     location: json['location'] as String,
-    dateMeet: json['dateMeet'] == null
-        ? null
-        : DateTime.parse(json['dateMeet'] as String),
+    dateMeet: json['dateMeet'],
     instructorName: json['instructorName'] as String,
     assignments: (json['assignments'] as List)
         ?.map((e) => e == null

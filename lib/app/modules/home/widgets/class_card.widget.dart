@@ -5,6 +5,8 @@ import 'package:ru_agenda/app/theme/color_theme.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:ru_agenda/app/data/models/class.model.dart';
 import 'package:ru_agenda/app/modules/home/controllers/home.controller.dart';
+import 'package:ru_agenda/app/modules/home/widgets/custom_dialog.widget.dart';
+import 'package:ru_agenda/app/modules/home/widgets/dialog_button.widget.dart';
 
 class ClassCard extends StatelessWidget {
   const ClassCard({
@@ -32,11 +34,53 @@ class ClassCard extends StatelessWidget {
                   caption: 'Remove',
                   color: kSecondColor,
                   icon: Icons.delete,
+                  onTap: () {
+                    Get.dialog(
+                      CustomDialog(
+                        title: 'Confirmation',
+                        content: 'Are you sure you want to remove this class?',
+                        actions: [
+                          DialogButton(
+                            text: 'Remove',
+                            onPressed: () {
+                              controller.removeClass(classModel);
+                              Get.back();
+                            },
+                          ),
+                          DialogButton(
+                            text: 'Cancel',
+                            onPressed: () {
+                              Get.back();
+                            },
+                          )
+                        ],
+                      ),
+                    );
+                  },
                 ),
                 IconSlideAction(
                   caption: 'Clear',
                   color: Colors.white,
                   icon: Icons.remove_circle_sharp,
+                  onTap: () {
+                    Get.dialog(CustomDialog(
+                        title: 'Confirmation',
+                        content:
+                            'Are you sure you want to clear data of this class?',
+                        actions: [
+                          DialogButton(
+                              text: 'Clear',
+                              onPressed: () {
+                                controller.clearDataOfClass(classModel);
+                                Get.back();
+                              }),
+                          DialogButton(
+                              text: 'Cancel',
+                              onPressed: () {
+                                Get.back();
+                              })
+                        ]));
+                  },
                 ),
               ],
               child: Card(

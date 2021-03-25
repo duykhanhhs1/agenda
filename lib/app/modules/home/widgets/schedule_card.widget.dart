@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
-
 import 'package:ru_agenda/app/theme/color_theme.dart';
 import 'package:ru_agenda/app/data/models/class.model.dart';
-
 
 class ScheduleCard extends StatelessWidget {
   const ScheduleCard({
@@ -16,6 +14,7 @@ class ScheduleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       margin: const EdgeInsets.only(top: 15, right: 15, left: 15),
       child: Padding(
         padding: const EdgeInsets.all(10),
