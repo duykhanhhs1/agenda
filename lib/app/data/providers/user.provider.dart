@@ -15,7 +15,10 @@ class UserProvider extends GetConnect {
     // }on DioError catch (e) {
     //   return UserModel();
     // }
-
     return AppMock.loginResponse;
+  }
+
+  getProfile() async {
+    return AppMock.loginResponse.user;
   }
 }

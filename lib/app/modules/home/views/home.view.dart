@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
-import 'package:ru_agenda/app/routes/app_pages.dart';
 import 'package:ru_agenda/app/theme/color_theme.dart';
 import 'package:ru_agenda/app/data/models/class.model.dart';
 import 'package:ru_agenda/app/data/models/assignment.model.dart';
@@ -9,7 +8,6 @@ import 'package:ru_agenda/app/modules/home/widgets/class_card.widget.dart';
 import 'package:ru_agenda/app/modules/home/widgets/schedule_card.widget.dart';
 import 'package:ru_agenda/app/modules/home/controllers/home.controller.dart';
 import 'package:ru_agenda/app/modules/home/widgets/custom_dialog.widget.dart';
-import 'package:ru_agenda/app/modules/home/widgets/dialog_button.widget.dart';
 import 'package:ru_agenda/app/modules/home/widgets/form_add_class.widget.dart';
 import 'package:ru_agenda/app/modules/home/widgets/assignment_card.widget.dart';
 import 'package:ru_agenda/app/modules/home/widgets/assignment_detail_container.dart';
@@ -62,21 +60,7 @@ class HomeView extends StatelessWidget {
     return Center(
         child: GestureDetector(
       onTap: () {
-        Get.dialog(CustomDialog(
-            title: 'Confirmation',
-            content: 'Are you sure you want to log out ?',
-            actions: [
-              DialogButton(
-                  text: 'Log out',
-                  onPressed: () {
-                    Get.offAllNamed(Routes.LOGIN);
-                  }),
-              DialogButton(
-                  text: 'Cancel',
-                  onPressed: () {
-                    Get.back();
-                  }),
-            ]));
+        Get.dialog(ConfirmLogoutDialog());
       },
       child: Icon(Icons.arrow_back_rounded),
     ));
@@ -101,23 +85,9 @@ class HomeView extends StatelessWidget {
           ),
         ),
         onTap: () {
-          Get.dialog(CustomDialog(
-              title: 'Confirmation',
-              content:
-                  'Are you sure you want to reset list of classes and list of assignments?',
-              actions: [
-                DialogButton(
-                    text: 'Reset',
-                    onPressed: () {
-                      controller.resetAll();
-                      Get.back();
-                    }),
-                DialogButton(
-                    text: 'Cancel',
-                    onPressed: () {
-                      Get.back();
-                    }),
-              ]));
+          Get.dialog(ConfirmResetDialog(
+            controller: controller,
+          ));
         },
       ),
     );
@@ -128,7 +98,15 @@ class HomeView extends StatelessWidget {
       onTap: () {
         controller.clearFieldsFormAddInput();
         if (controller.isSelectedByDate.value) {
-          Get.dialog(AssignmentDetailContainer(assignment: AssignmentModel()));
+          if (controller.classes.length > 0) {
+            Get.dialog(
+                AssignmentDetailContainer(assignment: AssignmentModel()));
+          } else
+            Get.snackbar(
+                'Error', 'You can not add an assignment because there is no class. Please add a class first.',
+                snackPosition: SnackPosition.BOTTOM,
+                colorText: Colors.red,
+                backgroundColor: Colors.white.withOpacity(.8));
         } else {
           Get.dialog(FormAddClass(classModel: ClassModel()));
         }

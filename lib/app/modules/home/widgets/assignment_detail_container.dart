@@ -206,22 +206,13 @@ class AssignmentDetailContainer extends StatelessWidget {
           DialogButton(
             text: 'Remove',
             onPressed: () {
-              Get.dialog(CustomDialog(
-                  title: 'Confirmation',
-                  content: 'Are you sure you want to remove this assignment?',
-                  actions: [
-                    DialogButton(
-                        onPressed: () {
-                          controller.removeAssignment(assignment);
-                          Get.back();
-                        },
-                        text: 'Remove'),
-                    DialogButton(
-                        onPressed: () {
-                          Get.back();
-                        },
-                        text: 'Cancel')
-                  ]));
+              Get.dialog(ConfirmRemoveDialog(
+                content: 'Are you sure you want to remove this assignment?',
+                onPressed: () {
+                  controller.removeAssignment(assignment);
+                  Get.back();
+                },
+              ));
             },
           ),
         SizedBox(width: 10),

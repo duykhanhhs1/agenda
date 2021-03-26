@@ -4,7 +4,7 @@ import 'package:ru_agenda/app/data/models/user.model.dart';
 
 class AppMock {
   static LoginResponseModel loginResponse = LoginResponseModel(
-    token: 'zxc',
+    token: 'token vip',
     refreshToken: 'refresh',
     user: UserModel(
       email: 'duykhanhhs1@gmail.com',

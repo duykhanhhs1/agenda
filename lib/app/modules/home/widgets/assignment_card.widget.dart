@@ -72,27 +72,17 @@ class AssignmentCard extends StatelessWidget {
 
   Widget _buildIconSlideAction(HomeController controller) {
     return IconSlideAction(
-                caption: 'Remove',
-                color: kSecondColor,
-                icon: Icons.delete,
-                onTap: () {
-                  Get.dialog(CustomDialog(
-                      title: 'Confirmation',
-                      content:
-                          'Are you sure you want to remove this assignment?',
-                      actions: [
-                        DialogButton(
-                            onPressed: () {
-                              controller.removeAssignment(assignment);
-                            },
-                            text: 'Remove'),
-                        DialogButton(
-                            onPressed: () {
-                              Get.back();
-                            },
-                            text: 'Cancel')
-                      ]));
-                },
-              );
+      caption: 'Remove',
+      color: kSecondColor,
+      icon: Icons.delete,
+      onTap: () {
+        Get.dialog(ConfirmRemoveDialog(
+          content: 'Are you sure you want to remove this assignment',
+          onPressed: () {
+            controller.removeAssignment(assignment);
+          },
+        ));
+      },
+    );
   }
 }

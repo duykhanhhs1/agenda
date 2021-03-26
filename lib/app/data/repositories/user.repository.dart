@@ -12,4 +12,7 @@ class UserRepository {
     return apiClient.verifyUser(username: username,password: password);
   }
 
+  getProfile() async {
+    return apiClient.getProfile();
+  }
 }
