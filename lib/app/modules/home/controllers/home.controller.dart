@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:ru_agenda/app/data/models/class.model.dart';
 import 'package:ru_agenda/app/data/models/assignment.model.dart';
 import 'package:ru_agenda/app/data/repositories/class.repository.dart';
+import 'package:ru_agenda/app/modules/home/widgets/assignment_card.widget.dart';
+import 'package:ru_agenda/app/modules/home/widgets/dialog_button.widget.dart';
+import 'package:ru_agenda/app/modules/home/widgets/notify_user.widget.dart';
 
 class HomeController extends GetxController {
   final ClassRepository repository;
@@ -32,8 +35,8 @@ class HomeController extends GetxController {
   TextEditingController locationInputController = TextEditingController();
   TextEditingController instructorInputController = TextEditingController();
 
-  DateTime dateSelected = DateTime.now();
-  TimeOfDay timeSelected = TimeOfDay.now();
+  Rx<DateTime> dateSelected = DateTime.now().obs;
+  Rx<TimeOfDay> timeSelected = TimeOfDay.now().obs;
 
   RxList<AssignmentModel> assignments = RxList<AssignmentModel>();
   RxList<ClassModel> classes = RxList<ClassModel>();
@@ -42,6 +45,7 @@ class HomeController extends GetxController {
   void onInit() {
     getAssignments();
     getClasses();
+
     // TODO: implement onInit
     super.onInit();
   }
@@ -62,7 +66,8 @@ class HomeController extends GetxController {
   void getAssignments() async {
     final List<AssignmentModel> data = await repository.getAssignments();
     assignments = data.obs;
-
+    sortAssignments();
+    checkNotify();
     update();
   }
 
@@ -93,10 +98,14 @@ class HomeController extends GetxController {
   }
 
   String getLongFormatDate() =>
-      DateFormat('EEEE, MMMM d, h:mm a').format(dateSelected);
+      DateFormat('EEEE, MMMM d, h:mm a').format(dateSelected.value);
 
   String getShortFormatDate() =>
-      DateFormat('dd-MM-y, h:mm a').format(dateSelected);
+      DateFormat('dd-MM-y, h:mm a').format(dateSelected.value);
+
+  void sortAssignments() {
+    assignments.sort((a, b) => a.dueDate.compareTo(b.dueDate));
+  }
 
   ///Show assignments
   void checkShowAssignsInClass(ClassModel classModel) {
@@ -116,7 +125,7 @@ class HomeController extends GetxController {
     assignDescInputController.text = assignment.assignmentDesc;
     assignNameInputController.text = assignment.assignmentName;
     noticeDaysSelected.value = assignment.numberNoticeDay;
-    dateSelected = assignment.dueDate;
+    dateSelected.value = assignment.dueDate;
   }
 
   void updateClassSelected(String className) {
@@ -132,23 +141,23 @@ class HomeController extends GetxController {
   void selectDate(BuildContext context, [AssignmentModel assignment]) async {
     await showDatePicker(
       context: context,
-      initialDate: dateSelected,
+      initialDate: dateSelected.value,
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
     ).then((value) {
-      if (value != null) dateSelected = value;
+      if (value != null) dateSelected.value = value;
       return dateSelected;
     });
     await showTimePicker(
       context: context,
       initialTime:
-          TimeOfDay(hour: timeSelected.hour, minute: timeSelected.minute),
+          TimeOfDay(hour: timeSelected.value.hour, minute: timeSelected.value.minute),
     ).then((value) {
-      if (value != null) timeSelected = value;
+      if (value != null) timeSelected.value = value;
       return timeSelected;
     });
-    dateSelected = DateTime(dateSelected.year, dateSelected.month,
-        dateSelected.day, timeSelected.hour, timeSelected.minute);
+    dateSelected.value = DateTime(dateSelected.value.year, dateSelected.value.month,
+        dateSelected.value.day, timeSelected.value.hour, timeSelected.value.minute);
     update();
   }
 
@@ -179,13 +188,14 @@ class HomeController extends GetxController {
   ///Add or save changes assignment
   void saveChangesAssignment(AssignmentModel assignment) {
     if (formKey.currentState.validate()) {
-      if (dateSelected.isAfter(DateTime.now())) {
+      if (dateSelected.value.isAfter(DateTime.now())) {
         if (assignment.assignmentName == null) assignments.add(assignment);
         assignment.assignmentName = assignNameInputController.text;
         assignment.assignmentDesc = assignDescInputController.text;
         assignment.className = classNameSelected.value;
         assignment.numberNoticeDay = noticeDaysSelected.value;
-        assignment.dueDate = dateSelected;
+        assignment.dueDate = dateSelected.value;
+        sortAssignments();
         setOpenFormEdit(false);
       } else {
         Get.snackbar(
@@ -207,8 +217,8 @@ class HomeController extends GetxController {
     courseNumInputController.clear();
     locationInputController.clear();
     instructorInputController.clear();
-    dateSelected = DateTime.now();
-    timeSelected = TimeOfDay.now();
+    dateSelected.value = DateTime.now();
+    timeSelected.value = TimeOfDay.now();
     update();
   }
 
@@ -222,11 +232,11 @@ class HomeController extends GetxController {
   ///CLASS
   void addClass(ClassModel classModel) {
     if (formKey.currentState.validate() &&
-        dateSelected.isAfter(DateTime.now())) {
+        dateSelected.value.isAfter(DateTime.now())) {
       classModel.courseTitle = courseTitleInputController.text;
       classModel.courseNumber = int.tryParse(courseNumInputController.text);
       classModel.location = locationInputController.text;
-      classModel.dateMeet = dateSelected;
+      classModel.dateMeet = dateSelected.value;
       classModel.instructorName = instructorInputController.text;
       classes.add(classModel);
       Get.back();
@@ -257,5 +267,16 @@ class HomeController extends GetxController {
     assignments.clear();
     classes.clear();
     update();
+  }
+
+  ///Check to show notify
+  void checkNotify() {
+    List<AssignmentModel> notifyAssignments = assignments
+        .where((_) => (_.dueDate.isAfter(DateTime.now()) &&
+            (_.dueDate.difference(DateTime.now()).inDays <= 2)))
+        .toList();
+    if (notifyAssignments.length > 0) {
+      Get.dialog(NotifyUser(notifyAssignments: notifyAssignments));
+    }
   }
 }

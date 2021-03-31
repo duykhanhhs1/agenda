@@ -1,18 +1,19 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:ru_agenda/app/modules/home/widgets/assignment_detail_container.dart';
+
 
 import 'package:ru_agenda/app/theme/color_theme.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:ru_agenda/app/data/models/assignment.model.dart';
 import 'package:ru_agenda/app/modules/home/controllers/home.controller.dart';
 import 'package:ru_agenda/app/modules/home/widgets/custom_dialog.widget.dart';
-import 'package:ru_agenda/app/modules/home/widgets/dialog_button.widget.dart';
 
 class AssignmentCard extends StatelessWidget {
   const AssignmentCard({
     Key key,
     this.assignment,
-    this.isShowingInClass,
+    this.isShowingInClass = false,
   }) : super(key: key);
 
   final AssignmentModel assignment;
@@ -23,16 +24,19 @@ class AssignmentCard extends StatelessWidget {
     return GetBuilder<HomeController>(
         init: Get.find(),
         builder: (controller) {
-          return Padding(
-            padding: isShowingInClass
-                ? const EdgeInsets.only(bottom: 0.5, left: 0, right: 0)
-                : const EdgeInsets.only(top: 15, right: 15, left: 15),
-            child: Slidable(
-              actionPane: SlidableDrawerActionPane(),
-              secondaryActions: [
-                _buildIconSlideAction(controller),
-              ],
-              child: Card(
+          return Slidable(
+            actionExtentRatio: .2,
+            actionPane: SlidableDrawerActionPane(),
+            secondaryActions: [
+              _buildIconSlideAction(controller),
+            ],
+            child:  GestureDetector(
+              onTap: () {
+                controller.setOpenFormEdit(false);
+                Get.dialog(
+                    AssignmentDetailContainer(assignment: assignment));
+              },
+              child:  Card(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                 margin: EdgeInsets.all(0),
                 shadowColor: kPrimaryColor,

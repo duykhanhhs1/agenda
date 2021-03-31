@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:form_field_validator/form_field_validator.dart';
 
 import 'package:ru_agenda/app/theme/color_theme.dart';
 import 'package:ru_agenda/app/data/models/class.model.dart';
-import 'package:form_field_validator/form_field_validator.dart';
 import 'package:ru_agenda/app/data/models/assignment.model.dart';
 import 'package:ru_agenda/app/widgets/rounded_input_field.widget.dart';
 import 'package:ru_agenda/app/modules/home/controllers/home.controller.dart';
@@ -11,7 +11,7 @@ import 'package:ru_agenda/app/modules/home/widgets/custom_dialog.widget.dart';
 import 'package:ru_agenda/app/modules/home/widgets/dialog_button.widget.dart';
 import 'package:ru_agenda/app/modules/home/widgets/rounded_container.widget.dart';
 
-class AssignmentDetailContainer extends StatelessWidget {
+class AssignmentDetailContainer extends GetView<HomeController> {
   const AssignmentDetailContainer({
     Key key,
     this.assignment,

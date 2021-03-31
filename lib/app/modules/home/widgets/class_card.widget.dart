@@ -1,8 +1,9 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+
 
 import 'package:ru_agenda/app/theme/color_theme.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:ru_agenda/app/data/models/class.model.dart';
 import 'package:ru_agenda/app/modules/home/controllers/home.controller.dart';
 import 'package:ru_agenda/app/modules/home/widgets/custom_dialog.widget.dart';
@@ -27,17 +28,18 @@ class ClassCard extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.only(top: 15, right: 15, left: 15),
             child: Slidable(
+              actionExtentRatio: 0.17,
               actionPane: SlidableDrawerActionPane(),
               secondaryActions: [
                 IconSlideAction(
                   caption: 'Remove',
                   color: kSecondColor,
-                  icon: Icons.delete,
+                  iconWidget: SizedBox(height: 0),
                   onTap: () {
                     Get.dialog(
                       ConfirmRemoveDialog(
                         content: 'Are you sure you want to remove this class?',
-                        onPressed: (){
+                        onPressed: () {
                           controller.removeClass(classModel);
                           Get.back();
                         },
@@ -48,7 +50,7 @@ class ClassCard extends StatelessWidget {
                 IconSlideAction(
                   caption: 'Clear',
                   color: Colors.white,
-                  icon: Icons.remove_circle_sharp,
+                  iconWidget: SizedBox(height: 0),
                   onTap: () {
                     Get.dialog(ConfirmClearDialog(
                       classModel: classModel,

@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
+
 import 'package:ru_agenda/app/theme/color_theme.dart';
 import 'package:ru_agenda/app/data/models/class.model.dart';
 import 'package:ru_agenda/app/data/models/assignment.model.dart';
@@ -49,7 +50,7 @@ class HomeView extends StatelessWidget {
                 if (controller.isSelectedByClass.value)
                   Expanded(child: _buildListClass(controller)),
                 if (controller.isSelectedBySchedule.value)
-                  Expanded(child: _buildListSchedule(controller))
+                  Expanded(child: _buildListSchedule(controller)),
               ],
             ),
           );
@@ -57,13 +58,13 @@ class HomeView extends StatelessWidget {
   }
 
   Widget _buildLogoutIcon() {
-    return Center(
-        child: GestureDetector(
-      onTap: () {
-        Get.dialog(ConfirmLogoutDialog());
+    return IconButton(
+      icon: Icon(Icons.arrow_back_rounded),
+      onPressed: () {
+
+    Get.dialog(ConfirmLogoutDialog());
       },
-      child: Icon(Icons.arrow_back_rounded),
-    ));
+    );
   }
 
   Widget _buildResetButton(HomeController controller) {
@@ -85,9 +86,10 @@ class HomeView extends StatelessWidget {
           ),
         ),
         onTap: () {
-          Get.dialog(ConfirmResetDialog(
-            controller: controller,
-          ));
+          controller.checkNotify();
+          // Get.dialog(ConfirmResetDialog(
+          //   controller: controller,
+          // ));
         },
       ),
     );
@@ -102,8 +104,8 @@ class HomeView extends StatelessWidget {
             Get.dialog(
                 AssignmentDetailContainer(assignment: AssignmentModel()));
           } else
-            Get.snackbar(
-                'Error', 'You can not add an assignment because there is no class. Please add a class first.',
+            Get.snackbar('Error',
+                'You can not add an assignment because there is no class. Please add a class first.',
                 snackPosition: SnackPosition.BOTTOM,
                 colorText: Colors.red,
                 backgroundColor: Colors.white.withOpacity(.8));
@@ -197,15 +199,14 @@ class HomeView extends StatelessWidget {
       shrinkWrap: true,
       itemCount: assignments.length,
       itemBuilder: (context, index) {
-        return GestureDetector(
-            onTap: () {
-              controller.setOpenFormEdit(false);
-              Get.dialog(
-                  AssignmentDetailContainer(assignment: assignments[index]));
-            },
-            child: AssignmentCard(
-                assignment: assignments[index],
-                isShowingInClass: isShowingInClass));
+        return Padding(
+          padding: isShowingInClass
+        ? const EdgeInsets.only(bottom: 0.5, left: 0, right: 0)
+            : const EdgeInsets.only(top: 15, right: 15, left: 15),
+          child: AssignmentCard(
+                  assignment: assignments[index],
+                  isShowingInClass: isShowingInClass),
+        );
       },
     );
   }

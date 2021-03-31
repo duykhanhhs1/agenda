@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:ru_agenda/app/data/models/class.model.dart';
 import 'package:ru_agenda/app/modules/home/controllers/home.controller.dart';
 import 'package:ru_agenda/app/modules/home/widgets/dialog_button.widget.dart';
-import 'package:ru_agenda/app/routes/app_pages.dart';
+import 'package:ru_agenda/app/modules/login/controllers/auth.controller.dart';
 
 class CustomDialog extends StatelessWidget {
   const CustomDialog({
@@ -88,7 +88,7 @@ class ConfirmRemoveDialog extends StatelessWidget {
   }
 }
 
-class ConfirmLogoutDialog extends StatelessWidget {
+class ConfirmLogoutDialog extends GetView<AuthController> {
   const ConfirmLogoutDialog({
     Key key,
   }) : super(key: key);
@@ -102,7 +102,7 @@ class ConfirmLogoutDialog extends StatelessWidget {
           DialogButton(
               text: 'Log out',
               onPressed: () {
-                Get.offAllNamed(Routes.LOGIN);
+                controller.logout();
               }),
           DialogButton(
               text: 'Cancel',

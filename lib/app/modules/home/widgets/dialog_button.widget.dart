@@ -1,9 +1,7 @@
-import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
 
 import 'package:ru_agenda/app/theme/color_theme.dart';
-import 'package:ru_agenda/app/modules/home/controllers/home.controller.dart';
 
 
 class DialogButton extends StatelessWidget {

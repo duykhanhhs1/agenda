@@ -6,7 +6,6 @@ import 'package:get_storage/get_storage.dart';
 import 'package:ru_agenda/app/data/models/user.model.dart';
 import 'package:ru_agenda/app/data/repositories/user.repository.dart';
 import 'package:ru_agenda/app/routes/app_pages.dart';
-import 'package:ru_agenda/app/utils/http_utils.dart';
 import 'package:ru_agenda/app/utils/keys.dart';
 
 class AuthController extends GetxController {
@@ -21,7 +20,6 @@ class AuthController extends GetxController {
   @override
   void onInit() {
     // TODO: implement onInit
-    //await ()
     super.onInit();
   }
 
@@ -67,8 +65,20 @@ class AuthController extends GetxController {
   Future<void> setLoggedUser(LoginResponseModel loginResponse) async {
     loggedUser.value = loginResponse.user;
     isLoggedIn.value = true;
+
     await _store.write(AppStorageKey.ACCESS_TOKEN, loginResponse.token);
     await _store.write(AppStorageKey.REFRESH_TOKEN, loginResponse.refreshToken);
+
     Get.toNamed(Routes.HOME);
+  }
+
+  Future<void> logout() async {
+    loggedUser.value = null;
+    isLoggedIn.value = false;
+
+    await _store.remove(AppStorageKey.ACCESS_TOKEN);
+    await _store.remove(AppStorageKey.REFRESH_TOKEN);
+
+    Get.offAllNamed(Routes.LOGIN);
   }
 }

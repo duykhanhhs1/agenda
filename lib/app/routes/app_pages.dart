@@ -13,14 +13,14 @@ import 'package:ru_agenda/app/modules/login/views/splash.view.dart';
 part 'app_routes.dart';
 
 class AppPages {
-  static const INITIAL = Routes.SPLASH;
+  static const INITIAL = Routes.HOME;
 
   static final routes = [
-    GetPage(
-      name: Routes.SPLASH,
-      page: () => SplashView(),
-      binding: AuthBinding(),
-    ),
+    // GetPage(
+    //   name: Routes.SPLASH,
+    //   page: () => SplashView(),
+    //   binding: AuthBinding(),
+    // ),
     GetPage(
       name: Routes.LOGIN,
       page: () => LoginView(),
